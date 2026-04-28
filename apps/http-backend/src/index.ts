@@ -1,10 +1,16 @@
+// Load .env FIRST, before any other imports
+import dotenv from "dotenv";
+import path from "path";
+dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
+
+// Now import config (after env is loaded)
+import { JWT_SECRET, PORT } from "@repo/backend-common/config"
 
 import express from "express"
 import cors from "cors"
-import { JWT_SECRET } from "@repo/backend-common/config"
-import { PORT } from '@repo/backend-common/config'
 import {z} from "zod"
 import bcrypt from "bcrypt"
+import jwt from "jsonwebtoken"
 import { CreateUserSchema, SigninSchema, CreateRoomSchema} from "@repo/common/types"
 import { prismaClient } from "@repo/db/client"
 
@@ -73,12 +79,12 @@ app.post('/signup', async (req, res)=>{
         
     } catch (error:any) {
 
-        // if(error.code === "P2002"){
-        //     return res.status(403).json({
-        //         message:"User already exist.",
-        //         Error:error
-        //     })
-        // }
+        if(error.code === "P2002"){
+            return res.status(403).json({
+                message:"User already exist.",
+                Error:error
+            })
+        }
         console.log(error);
 
         return res.status(500).json({
@@ -94,7 +100,29 @@ app.post('/signup', async (req, res)=>{
 
 
 // signIn
-app.post('/sign', (req,res)=>{
+app.post('/sign',async (req,res)=>{
+
+    const parsedData = SigninSchema.safeParse(req.body);
+    if(!parsedData.success){
+        return res.status(400).json({
+            message:"Invalid input formate."
+        })
+    }
+
+
+    const user = await prismaClient.user.findFirst({
+        where: {
+            email: parsedData.data.username,
+            password: parsedData.data.password
+        }
+    })
+
+
+    const userId = user?.id;
+    const token = jwt.sign({userId}, JWT_SECRET);
+
+
+
 
 })
 
