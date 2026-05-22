@@ -13,6 +13,7 @@ import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { CreateUserSchema, SigninSchema, CreateRoomSchema} from "@repo/common/types"
 import { prismaClient } from "@repo/db/client"
+import { UserMiddleware } from "./middleware";
 
 
 const app = express()
@@ -100,7 +101,9 @@ app.post('/signup', async (req, res)=>{
 
 
 // signIn
-app.post('/sign',async (req,res)=>{
+app.post('/signin',async (req,res)=>{
+
+  try {
 
     const parsedData = SigninSchema.safeParse(req.body);
     if(!parsedData.success){
@@ -117,9 +120,43 @@ app.post('/sign',async (req,res)=>{
         }
     })
 
+    if(!user){
+        res.status(403).json({
+            message:"Invalid user. User not exist."
+        })
+        return
+    }
+
+    //validate password-
+    const validatePassword = await bcrypt.compare(parsedData.data.password, user.password);
+    if(!validatePassword){
+        return res.status(443).json({
+            message:"Invalid password. Try again"
+        })
+    }
 
     const userId = user?.id;
     const token = jwt.sign({userId}, JWT_SECRET);
+    
+
+    // res.status(200).json({
+    //     token:token
+    // })
+
+    //------Browser stores cookie-----
+    res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    })
+    
+
+  } catch (error) {
+    return res.status(411).json({
+        message:"error in signing in."
+    })
+    
+  }
 
 
 
@@ -128,6 +165,28 @@ app.post('/sign',async (req,res)=>{
 
 
 
+
+
+
+
+
+app.post("/room", UserMiddleware, (req, res)=>{
+    const data = CreateRoomSchema.safeParse(req.body);
+
+    if(!data.success){
+        res.json({
+            message:"Incorrect inputs"
+        })
+        return;
+    }
+
+    //db-call to create room...
+
+    res.json({
+        
+    })
+
+} )
 
 
 
