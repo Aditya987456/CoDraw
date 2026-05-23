@@ -3,9 +3,12 @@ import dotenv from "dotenv";
 import path from "path";
 dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
 
+
+
 // Now import config (after env is loaded)
 import { JWT_SECRET, PORT } from "@repo/backend-common/config"
 
+import cookieParser from "cookie-parser";
 import express from "express"
 import cors from "cors"
 import {z} from "zod"
@@ -22,6 +25,7 @@ app.use(express.json());
 const saltRounds = 6;
 
 
+app.use(cookieParser());
 
 
 app.get('/h', (req,res)=>{
@@ -40,14 +44,15 @@ app.post('/signup', async (req, res)=>{
     try {
         
         const parsedData = CreateUserSchema.safeParse(req.body);
+        console.log(parsedData);
         if(!parsedData.success){
             return res.status(400).json({
-                message:"Incorrect input formate"
+                message:"Incorrect input formate..."
             })
         }
 
 
-        const { name, email, password } = req.body;
+        const { name, email, password } = parsedData.data;
 
         //find in db is this user is unique or not?  -->it may cause race condition so not rely on this...
         // const uniqueUser = ....req from db...
@@ -63,7 +68,7 @@ app.post('/signup', async (req, res)=>{
         //save user in db--
         const user = await prismaClient.user.create({
             data:{
-                email: parsedData.data?.username,
+                email: parsedData.data?.email,
                 password: hashedPassword,
                 name: parsedData.data?.name
             }
@@ -115,8 +120,8 @@ app.post('/signin',async (req,res)=>{
 
     const user = await prismaClient.user.findFirst({
         where: {
-            email: parsedData.data.username,
-            password: parsedData.data.password
+            email: parsedData.data.email,
+        
         }
     })
 
@@ -135,6 +140,8 @@ app.post('/signin',async (req,res)=>{
         })
     }
 
+
+    //this is the saved id from the db of this user field...and we are creating the token using this id...
     const userId = user?.id;
     const token = jwt.sign({userId}, JWT_SECRET);
     
@@ -143,11 +150,17 @@ app.post('/signin',async (req,res)=>{
     //     token:token
     // })
 
+
     //------Browser stores cookie-----
     res.cookie("token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+
+    res.status(200).json({
+        message: "Logged in"
     })
     
 
@@ -164,6 +177,11 @@ app.post('/signin',async (req,res)=>{
 })
 
 
+app.post('/ans', UserMiddleware, (req,res)=>{
+    return res.status(200).json({
+        message:"HII AFter passing middleware..."
+    })
+})
 
 
 
