@@ -25,6 +25,9 @@ model User {
   password    String
   name        String
   photo       String?
+
+  //----------------below these are not will be there in table---------------
+  //one user -- many rooms
   rooms       Room[]
   chats       Chat[]
 }
@@ -33,12 +36,16 @@ model User {
 
 model Room {
   id          Int       @id @default(autoincrement())
+   // Unique room name...
   slud        String    @unique
   createdAt   DateTime  @default(now())
+  // Foreign Key (stores User.id)...
   adminId     String
 
-  admin       User      @relation(fields: [adminId], references: [id] )
 
+
+// Connected User object using adminId
+  admin       User      @relation(fields: [adminId], references: [id] )
   chats       Chat[]
 }
 
@@ -46,14 +53,36 @@ model Room {
 model Chat {
   //why id here is we are taking int?
   id          Int     @id @default(autoincrement())
+  // Foreign Key -> stores Room.id
   roomId      Int
   message     String
+  // Foreign Key -> stores User.id
   userId      String
 
+
+
+  
+  // Connected Room object using roomId
   room        Room      @relation(fields: [roomId], references: [id])
+  // Connected User object using userId
   user        User      @relation(fields: [userId], references: [id])
 
 
 }
+
+
+
+
+
+
+/*
+
+adminId -> stores id
+
+admin -> gives one connected object
+
+rooms -> gives many connected objects
+
+*/
 
 
