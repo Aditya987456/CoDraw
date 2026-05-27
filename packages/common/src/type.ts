@@ -13,7 +13,7 @@ export const SigninSchema = z.object({
 })
 
 export const CreateRoomSchema = z.object({
-    roomNane:z.string().min(3).max(20),
+    roomName:z.string().min(3).max(20),
 })
 
 

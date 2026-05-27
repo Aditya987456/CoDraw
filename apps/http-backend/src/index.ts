@@ -177,6 +177,7 @@ app.post('/signin',async (req,res)=>{
 })
 
 
+//just for checking middleware working...
 app.post('/ans', UserMiddleware, (req,res)=>{
     return res.status(200).json({
         message:"HII AFter passing middleware..."
@@ -188,21 +189,56 @@ app.post('/ans', UserMiddleware, (req,res)=>{
 
 
 
-app.post("/room", UserMiddleware, (req, res)=>{
-    const data = CreateRoomSchema.safeParse(req.body);
+app.post("/room", UserMiddleware, async (req, res)=>{
+    const ParsedData = CreateRoomSchema.safeParse(req.body);
 
-    if(!data.success){
+    if(!ParsedData.success){
         res.json({
-            message:"Incorrect inputs"
+            message:"Incorrect input format for creating the room..."
         })
         return;
     }
 
-    //db-call to create room...
+    const userId = req.userId;
+    if(!userId){
+        return res.status(404).json({
+            message:"User not found."
+        })
+    }
 
-    res.json({
+
+    try {
+
+        //db-call to create room...
+        //return promise not immediately create room so await -- basic things man...
+
+        const room = await prismaClient.room.create({
+            data:{
+                slug:ParsedData.data.roomName,
+                adminId:userId
+            }
+        })
+
+        res.status(200).json({
+            message:"Room is created with ID :",
+            roomId : room.id
+        })
         
-    })
+    } catch (error:any) {
+
+        if (error.code === "P2002") {
+        return res.status(400).json({
+            message: "Room already exists"
+        });
+        }   
+
+
+        res.status(400).json({
+            message:"Error in creating the room"
+        })
+    }
+
+    
 
 } )
 

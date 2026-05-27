@@ -37,7 +37,7 @@ model User {
 model Room {
   id          Int       @id @default(autoincrement())
    // Unique room name...
-  slud        String    @unique
+  slug        String    @unique
   createdAt   DateTime  @default(now())
   // Foreign Key (stores User.id)...
   adminId     String
