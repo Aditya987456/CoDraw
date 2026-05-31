@@ -1,3 +1,35 @@
+# My Notes and Important concepts that i learnt during building this - 
+
+> req.cookies.token works in Express because middleware like cookie-parser has already parsed the cookie string into an object.
+
+> In native ws, you only get the raw header (req.headers.cookie), so you must parse it yourself using cookie.parse() before accessing cookies.token.
+
+
+
+<br>
+<br>
+
+<br>
+<br>
+
+
+<br>
+<br>
+
+
+
+
+
+
+<br>
+<br>
+
+
+<br>
+<br>
+
+
+
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.
