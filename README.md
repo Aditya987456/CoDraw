@@ -9,6 +9,21 @@
 <br>
 <br>
 
+
+### TS type-
+
+```
+JSON.parse() -> any
+
+any -> TypeScript trusts you and skips checking properties.
+
+That's why parsedData.type doesn't produce an error.
+```
+
+
+<br>
+<br>
+
 <br>
 <br>
 
