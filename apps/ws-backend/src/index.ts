@@ -1,13 +1,15 @@
 import dotenv from "dotenv";
 import path from "path";
-import { WebSocketServer, WebSocket } from "ws";
-import jwt from "jsonwebtoken"
-import cookie from "cookie";
-import { JWT_SECRET } from "@repo/backend-common/config"  //...
-import { prismaClient } from "@repo/db/client";
-
 // Load .env from project root
 dotenv.config({ path: path.resolve(process.cwd(), "../../.env") });
+import { WebSocketServer, WebSocket } from "ws";
+import jwt from "jsonwebtoken"
+//import cookie from "cookie";
+import { JWT_SECRET } from "@repo/backend-common/config"  //...
+import { prismaClient } from "@repo/db/client";
+import { parse } from "cookie";
+
+
 
 
 interface User {
@@ -42,10 +44,14 @@ function VerifyToken(token:string) {
 
     return decoded.userId;
   } catch(e) {
+    console.log("JWT ERROR:", e);
     return null;
+    
   }
 
 }
+
+
 
 wss.on('connection', function connection(ws, request){
 
@@ -54,18 +60,33 @@ wss.on('connection', function connection(ws, request){
     // const token = queryParams.get('token');
 
 
-    const cookies = cookie.parse(
+    // const cookies = cookie.parse(
+    //     request.headers.cookie || ""
+    // );
+
+    const cookies = parse(
         request.headers.cookie || ""
     );
 
+    console.log('connection attempt...')
+    
+
     const token = cookies.token;
+
+    console.log("Token:", token);
+
+
     if (!token) {
+        console.log("No token found");
         ws.close();
         return;
     }
 
+    
+
     const userId = VerifyToken(token);
     if(userId == null){
+        console.log('jwt verification failed.')
         ws.close();
         return null;
     }
@@ -126,7 +147,7 @@ wss.on('connection', function connection(ws, request){
             try {
                 const room = await prismaClient.room.findUnique({
                     where:{
-                        slug:roomId
+                        id:Number(roomId)
                     }
                 })
 
@@ -214,6 +235,7 @@ wss.on('connection', function connection(ws, request){
                     if(everyone.rooms.includes(roomId)){
                         everyone.ws.send(JSON.stringify({
                             type:"chat",
+                            message,
                             roomId              //sending roomid also even sending msg in that room , becz it will helps in frontend.
                         }))
                     }
