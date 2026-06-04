@@ -246,6 +246,76 @@ app.post("/room", UserMiddleware, async (req, res)=>{
 
 
 
+//#### here i should used things like - pagination so easy load of large quantity messages...
+
+
+// get old messages... of the room in which user joined...
+app.get("/chats/:roomId", async (req, res) => {
+
+    try {
+        const roomId = Number(req.params.roomId)
+        const messages = await prismaClient.chat.findMany({
+            where:{
+                roomId:roomId,
+            },
+            orderBy:{
+                id:"desc"
+            },
+            take:500
+        })
+
+        res.status(200).json({
+            messages
+        })
+
+    } catch (error) {
+        console.log('error :', error);
+        res.status(404).json({
+            messages:[]
+        })
+    }
+
+})
+
+
+
+
+
+
+
+
+// get roomId using the slug name...
+app.get("/room/:slug", async (req, res)=>{
+
+    try {
+
+        const slug = req.params.slug;
+        const roomId = await prismaClient.room.findFirst({
+            where:{
+                slug:slug
+            }
+        })
+
+        res.status(200).json({
+            roomId : roomId
+        })
+
+
+    } catch (error) {
+        console.log('Error in finding the roomId using slug', error)
+        res.status(404).json({
+            roomId:null
+        })
+    }
+
+})
+
+
+
+
+
+
+
 
 
 

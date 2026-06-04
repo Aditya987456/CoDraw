@@ -24,6 +24,78 @@ That's why parsedData.type doesn't produce an error.
 <br>
 <br>
 
+## ChatGPT suggestion - future improvements (backend)
+
+1. Rate Limiting
+   - Prevent spam messages
+   - Prevent abuse / DoS attacks
+   - Example: max 20 messages per second per user
+
+2. Message Validation
+   - Validate incoming websocket payloads
+   - Use Zod schemas
+   - Check message length, format, roomId, etc.
+
+3. Queue System (BullMQ + Redis)
+   - Offload heavy work from websocket server
+   - Save messages/drawings asynchronously
+   - Handle notifications and background jobs
+
+4. Redis
+   - Shared state across multiple WS servers
+   - Online presence tracking
+   - Room membership storage
+   - Pub/Sub for broadcasting
+
+5. Presence System
+   - Show users online/offline
+   - Track active users in rooms
+
+6. Drawing Optimization
+   - Batch drawing events
+   - Debounce/throttle mouse movements
+   - Reduce websocket traffic
+
+7. Security
+   - Message sanitization
+   - Room access control
+   - Better authorization checks
+
+8. Scalability
+   - Multiple websocket servers
+   - Load balancing
+   - Horizontal scaling
+
+9. Monitoring & Logging
+   - Structured logs
+   - Error tracking
+   - Metrics and analytics
+
+10. Reconnection Handling
+    - Auto reconnect
+    - Restore room membership
+    - Recover unsent events
+
+11. Event Persistence
+    - Store drawing events
+    - Replay drawings for new users
+    - Event sourcing concepts
+
+12. System Design Concepts
+    - Pub/Sub
+    - Message Queues
+    - Caching
+    - Distributed Systems
+    - Real-time Architecture
+
+Current Version:
+- JWT Authentication ✅
+- Room Management ✅
+- WebSocket Broadcasting ✅
+- Database Persistence ✅
+
+*/
+
 <br>
 <br>
 
