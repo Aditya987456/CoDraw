@@ -89,10 +89,10 @@ That's why parsedData.type doesn't produce an error.
     - Real-time Architecture
 
 Current Version:
-- JWT Authentication ✅
-- Room Management ✅
-- WebSocket Broadcasting ✅
-- Database Persistence ✅
+- JWT Authentication 
+- Room Management 
+- WebSocket Broadcasting 
+- Database Persistence 
 
 */
 

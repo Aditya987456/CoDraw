@@ -11,7 +11,6 @@ import { JWT_SECRET, PORT } from "@repo/backend-common/config"
 import cookieParser from "cookie-parser";
 import express from "express"
 import cors from "cors"
-import {z} from "zod"
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { CreateUserSchema, SigninSchema, CreateRoomSchema} from "@repo/common/types"
@@ -24,7 +23,7 @@ app.use(cors());
 app.use(express.json());
 const saltRounds = 6;
 
-
+//##cookie-parser adds cookies object to req.
 app.use(cookieParser());
 
 

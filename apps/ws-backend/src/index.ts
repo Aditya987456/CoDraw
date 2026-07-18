@@ -55,6 +55,7 @@ function VerifyToken(token:string) {
 
 wss.on('connection', function connection(ws, request){
 
+    //here "request" becz we need cookies from http connection before upgrading to ws.
     //------------- if we passing token in url -------------------------------
     // const queryParams = new URLSearchParams(url.split('?')[1]);
     // const token = queryParams.get('token');
@@ -135,7 +136,7 @@ wss.on('connection', function connection(ws, request){
         if(parsedData.type == "join-room"){
             const roomId = parsedData.roomId;
 
-        //check is user is there or not
+        //check is user is there or not-- since hona chahiye becz we do that during connection and if not there means alag se request kar raha hai bad...
             const currentUser = users.find(x => x.ws === ws);
             if(!currentUser){
                 ws.close();
@@ -206,7 +207,7 @@ wss.on('connection', function connection(ws, request){
             const message = parsedData.message;
 
 
-            //check is user is exist in users storage or not...--> someone may do things like send req from devtools.
+            //## $$ check is user is exist in users storage or not...--> someone may do things like send req from devtools.
             const currentUser = users.find(x=>x.ws == ws);
             if(!currentUser){
                 ws.close();
@@ -215,7 +216,7 @@ wss.on('connection', function connection(ws, request){
 
 
 
-            //NOTE - here we should also do checks like is there is message is good or not mostly for chat app like msg is abusive like checks.. and many more things...
+            //$$ NOTE - here we should also do checks like is there is message is good or not mostly for chat app like msg is abusive like checks.. and many more things...
             
 
             try {

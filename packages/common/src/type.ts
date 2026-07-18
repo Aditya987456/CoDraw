@@ -20,6 +20,15 @@ export const CreateRoomSchema = z.object({
 
 
 
+//"Some unknown object came from jwt.verify"
+// "Trust me decoded object has shape:
+// {
+//   userId: string
+// }
+// "
+
+
+//"Any object of type JwtPayloadType must contain userId and it must be a string."
 export interface CustomJwtPayload extends JwtPayload {
   userId: string;
 }

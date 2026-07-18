@@ -3,3 +3,7 @@ declare namespace Express {
     userId?: string;
   }
 }
+
+// This is specifically to teach Express:
+// "req.userId exists"
+// Because Express default Request type does not know it.
