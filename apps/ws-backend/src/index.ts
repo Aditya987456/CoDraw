@@ -115,12 +115,18 @@ wss.on('connection', function connection(ws, request){
     //## here message is not like text things here message like some request to join a room, send text msg, leave the room , like that all are consider as messages from the client end...
     
     ws.on('message', async function message(data){
-        
+
+
+        //# here switch is also helpful...
+
+        try {
+
+
         let parsedData;
         if (typeof data !== "string") {
             parsedData = JSON.parse(data.toString());
         } else {
-            parsedData = JSON.parse(data); // like - {type: "join-room", roomId: 1}
+            parsedData = JSON.parse(data); //###$$$ like - {type: "join-room", roomId: 1}
         }
 
 
@@ -162,6 +168,11 @@ wss.on('connection', function connection(ws, request){
 
                 currentUser.rooms.push(roomId);  //everything is there so update and save the rooms in which user is joining.
 
+                //success message.
+                ws.send(JSON.stringify({
+                    type: "join_room_success",
+                    roomId
+                }));
 
             } catch (error) {
                 console.error("err in joining room",error);
@@ -190,7 +201,12 @@ wss.on('connection', function connection(ws, request){
             }
 
             //if everything is there then now leave saaar.
-            currentUser.rooms = currentUser.rooms.filter(x => x == roomId);  //return new arr that not have this room id.
+            currentUser.rooms = currentUser.rooms.filter(x => x !== roomId);  //return new arr that not have this room id.
+
+            ws.send(JSON.stringify({
+                type: "leave_room_success",
+                roomId
+            }));
 
         }
 
@@ -253,21 +269,17 @@ wss.on('connection', function connection(ws, request){
             }
 
         }
-
-
-
-
-
+            
+        } catch (error) {
+                ws.send(JSON.stringify({
+                type: "error",
+                message: "Invalid JSON"
+            }));
+            
+        }
         
 
     })
-
-
-
-
-
-
-
 
 
 
