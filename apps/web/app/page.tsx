@@ -1,31 +1,20 @@
 import Image, { type ImageProps } from "next/image";
-import { Button } from "@repo/ui/button";
-import styles from "./page.module.css";
+import { Logo } from "@repo/ui";
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
   srcDark: string;
 };
 
-const ThemeImage = (props: Props) => {
-  const { srcLight, srcDark, ...rest } = props;
-
-  return (
-    <>
-      <Image {...rest} src={srcLight} className="imgLight" />
-      <Image {...rest} src={srcDark} className="imgDark" />
-    </>
-  );
-};
-
-
-
 
 export default function Home() {
   return (
     
-    <div>
-
-    </div>
+    <main className="min-h-screen flex items-center justify-center bg-yellow-600">
+      <h1 className="text-5xl font-bold text-white">
+        CoDraw 
+      </h1>
+      <Logo/>
+    </main>
   );
 }
