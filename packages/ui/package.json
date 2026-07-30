@@ -20,9 +20,9 @@
     "typescript": "5.9.2"
   },
   "dependencies": {
-    "react": "^19.2.0",
     "@repo/common": "workspace:*",
+    "lucide-react": "^1.28.0",
+    "react": "^19.2.0",
     "react-dom": "^19.2.0"
-    
   }
 }
