@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Scan the shared UI package */
+@source "../../../packages/ui/src";
+
+@theme {
+  --font-space: var(--font-space-grotesk), sans-serif;
+  --font-inter: var(--font-inter-sans), sans-serif;
+}
+
 /* 
 @keyframes float1 {
   0%,100% {

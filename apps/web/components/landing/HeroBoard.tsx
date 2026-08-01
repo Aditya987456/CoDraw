@@ -65,40 +65,37 @@
 
 
 
-
 import { COLORS } from "@repo/common/constants";
 import { Cursor } from "../shared/Cursor";
 
 export function HeroBoard() {
   return (
     <div
-      style={{
-        position: "relative",
-        width: "100%",
-        aspectRatio: "16 / 10",
-        maxHeight: 450,
-        minHeight: 260,
-        borderRadius: 18,
-        overflow: "hidden",
-        border: `1.5px solid ${COLORS.border}`,
-        backgroundColor: COLORS.panel,
-        backgroundImage: `
-          linear-gradient(${COLORS.boardLine} 1px, transparent 1px),
-          linear-gradient(90deg, ${COLORS.boardLine} 1px, transparent 1px)
-        `,
-        backgroundSize: "26px 26px",
-        boxShadow: "0 24px 60px -30px rgba(28,29,33,0.25)",
-      }}
-    >
+  className="
+    relative
+    w-full
+    max-w-[640px]
+    aspect-[16/10]
+    overflow-hidden
+    rounded-2xl
+    sm:rounded-3xl
+    mx-auto
+  "
+  style={{
+    border: `1.5px solid ${COLORS.border}`,
+    backgroundColor: COLORS.panel,
+    backgroundImage: `
+      linear-gradient(${COLORS.boardLine} 1px, transparent 1px),
+      linear-gradient(90deg, ${COLORS.boardLine} 1px, transparent 1px)
+    `,
+    backgroundSize: "26px 26px",
+    boxShadow: "0 24px 60px -30px rgba(28,29,33,.25)",
+  }}
+>
       <svg
         viewBox="0 0 600 380"
-        width="100%"
-        height="100%"
         preserveAspectRatio="xMidYMid meet"
-        style={{
-          position: "absolute",
-          inset: 0,
-        }}
+        className="absolute inset-0 h-full w-full"
       >
         {/* Idea */}
         <rect

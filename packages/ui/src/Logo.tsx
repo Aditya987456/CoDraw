@@ -1,10 +1,32 @@
 import { COLORS } from "@repo/common/constants";
 
-export function Logo({ size = 22, color = COLORS.ink }) {
+export interface LogoProps {
+  size?: number;
+  color?: string;
+}
+
+export function Logo({
+  size = 22,
+  color = COLORS.ink,
+}: LogoProps) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-        <rect x="2" y="2" width="20" height="20" rx="5" fill={COLORS.blue} />
+    <div className="flex items-center gap-2">
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        className="shrink-0"
+      >
+        <rect
+          x="2"
+          y="2"
+          width="20"
+          height="20"
+          rx="5"
+          fill={COLORS.blue}
+        />
+
         <path
           d="M7 15.5 L11 8 L14 13 L17 8.5"
           stroke="#fff"
@@ -13,12 +35,11 @@ export function Logo({ size = 22, color = COLORS.ink }) {
           strokeLinejoin="round"
         />
       </svg>
+
       <span
+        className="font-space font-semibold tracking-[-0.02em] whitespace-nowrap"
         style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontWeight: 600,
           fontSize: size * 0.82,
-          letterSpacing: "-0.02em",
           color,
         }}
       >
