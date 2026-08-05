@@ -273,7 +273,7 @@ export function Button({
   ].join(" ");
 
 
-  console.log(classes);
+  //console.log(classes);
   return (
     <button
       type="button"
