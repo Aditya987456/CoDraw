@@ -3,9 +3,13 @@
 import type { LucideIcon } from "lucide-react";
 
 import { Input } from "@repo/ui";
+import { ChangeEventHandler } from "react";
 
 interface FieldProps {
   id: string;
+  name:string;
+  value:string;
+  onChange:ChangeEventHandler<HTMLInputElement>;
   label: string;
   type?: string;
   placeholder: string;
@@ -15,6 +19,9 @@ interface FieldProps {
 
 export function Field({
   id,
+  name,
+  onChange,
+  value,
   label,
   type = "text",
   placeholder,
@@ -32,6 +39,9 @@ export function Field({
 
       <Input
         id={id}
+        onChange={onChange}
+        value={value}
+        name={name}
         type={type}
         placeholder={placeholder}
         icon={icon}

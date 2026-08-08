@@ -185,6 +185,10 @@ export interface ButtonProps {
   children: ReactNode;
   variant?: "primary" | "accent" | "outline" | "ghost";
   size?: "nav" | "default" | "hero" | "icon";
+
+  //here i will update so that we have to pass the type when we needed button component , here for now its just optional thing
+  type?:"button" | "submit"  | "reset"
+
   icon?: LucideIcon;
   onClick?: () => void;
   disabled?: boolean;
@@ -194,6 +198,7 @@ export interface ButtonProps {
 
 export function Button({
   children,
+  type="button",
   variant = "primary",
   size = "default",
   icon: Icon,
@@ -273,10 +278,10 @@ export function Button({
   ].join(" ");
 
 
-  //console.log(classes);
+  //+console.log(classes);
   return (
     <button
-      type="button"
+      type={type}
       disabled={disabled}
       onClick={onClick}
       style={{

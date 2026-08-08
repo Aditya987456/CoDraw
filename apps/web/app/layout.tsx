@@ -30,6 +30,8 @@
 //     </html>
 //   );
 // }
+
+import ToastProvider from "../components/ToastProvider";
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
@@ -59,7 +61,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${spaceGrotesk.variable} ${inter.variable}`}>
-      <body className="font-inter antialiased">{children}</body>
+      <body className="font-inter antialiased">
+        <ToastProvider />
+        {children}
+      </body>
     </html>
   );
 }
