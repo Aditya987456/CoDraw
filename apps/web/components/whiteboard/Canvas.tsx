@@ -6,6 +6,11 @@ type canvasProps = {
     roomId:string
 }
 
+type point = {
+    x:number,
+    y:number
+}
+
 //descriminated union -> ....
 type Shape = {
     //id:string,
@@ -27,6 +32,15 @@ type Shape = {
     y:number,
     width:number,
     height:number
+} | {
+    type:"line",
+    x:number,
+    y:number,
+    endX:number,
+    endY:number
+} | {
+    type:"pencil",
+    Points:point[]
 }
 
 
@@ -44,10 +58,13 @@ export default function Canvas( {roomId}: canvasProps){
     const isDrawing = useRef(false);
     const [shapes, setShapes]=useState<Shape[]>([]);  //actual data...
 
-    const [tool, setTool] = useState<"rect" | "circle" | "ellipse">("circle");
+    const [tool, setTool] = useState<"rect" | "circle" | "ellipse" | "line" | "pencil">("circle");
     const toolRef = useRef(tool)
 
     const shapeRef = useRef<Shape[]>([])   //needed becz in mousemove func old state which is [] is there becz dependency array of useeffect is [] . i.e only runs at mounting...
+
+    //pencil- inka alag hi hutiya... hai
+    const currentPencilPoints = useRef<point[]>([])  //pencil is combination of points, so while the user is currently drawing the pencil, the pencil isn't finished yet.
 
     //current drawing starting points...
     const startX = useRef(0);
@@ -61,7 +78,7 @@ export default function Canvas( {roomId}: canvasProps){
 
 
 
-    function changeTool(newtool:"rect"|"circle"|"ellipse"){
+    function changeTool(newtool:"rect"|"circle"|"ellipse"|"line"|"pencil"){
         setTool(newtool);
         toolRef.current = newtool
     }
@@ -144,6 +161,32 @@ export default function Canvas( {roomId}: canvasProps){
                 );
 
                 ctx.stroke();
+            }
+
+            //line
+            if(shape.type === "line"){
+
+                ctx.beginPath();
+
+                ctx.moveTo(shape.x, shape.y);
+                ctx.lineTo(shape.endX, shape.endY)
+
+                ctx.stroke()
+            }
+
+            //pencil
+            if(shape.type === "pencil"){
+
+                ctx.beginPath();
+
+                ctx.moveTo(shape.Points[0]!.x , shape.Points[0]!.y)
+
+                for(let i=1; i<shape.Points.length; i++){
+                    ctx.lineTo(shape.Points[i]!.x, shape.Points[i]!.y)
+                }
+
+                ctx.stroke()
+
             }
 
 
@@ -234,8 +277,14 @@ export default function Canvas( {roomId}: canvasProps){
                 startX.current = point.x;
                 startY.current = point.y;
 
+            //since its pencil so combination of points so starting is also one point to add in array of points...
+                if(toolRef.current === "pencil"){
+                    currentPencilPoints.current = [point]
+                }
                 //console.log("mousedown viewport-Start : ", e.clientX, e.clientY);
             }
+
+
 
             function HandleMouseUp(e:MouseEvent){
                 isDrawing.current = false;
@@ -274,11 +323,13 @@ export default function Canvas( {roomId}: canvasProps){
                     };
 
                 }
-                else{
+
+                else if(toolRef.current === "ellipse"){
 
                     const width = point.x - startX.current;
                     const height = point.y - startY.current;
 
+                    //x,y  --> says where the shapes starts horizontally and vertically...
                     const x = Math.min(startX.current, point.x);
                     const y = Math.min(startY.current, point.y);
 
@@ -290,7 +341,25 @@ export default function Canvas( {roomId}: canvasProps){
                         height: Math.abs(height)
                     }
 
+                }
+                else if(toolRef.current === "line"){
 
+                    newShape = {
+                        type:"line",
+                        x:startX.current,
+                        y:startY.current,
+                        endX:point.x,
+                        endY:point.y
+
+                    }
+                }
+                else {
+
+                    newShape = {
+                        type:"pencil",
+                        Points:[...currentPencilPoints.current]   //This creates a copy of the array.
+                    }
+                    currentPencilPoints.current = [];
 
                 }
 
@@ -378,6 +447,7 @@ export default function Canvas( {roomId}: canvasProps){
                     const width = point.x - startX.current;
                     const height = point.y - startY.current;
 
+                    //x,y  --> says where the shapes starts horizontally and vertically...
                     const x = Math.min(startX.current, point.x);
                     const y = Math.min(startY.current, point.y);
 
@@ -401,6 +471,43 @@ export default function Canvas( {roomId}: canvasProps){
 
                     ctx.stroke();
 
+                }
+
+
+                if(toolRef.current === "line"){
+
+                    ctx.beginPath();
+
+                    ctx.moveTo(startX.current, startY.current)
+                    ctx.lineTo(point.x, point.y)
+
+                    ctx.stroke()
+
+                }
+
+                if(toolRef.current === "pencil"){
+
+                    //storing every points in points array...
+                    currentPencilPoints.current.push(point);
+                    const AllPoint= currentPencilPoints.current;
+
+                    // if(AllPoint.length === 0){
+                    //     return;
+                    // }
+
+                    //drawing while dragging... 
+                    //! -- means trust me bro there will be val not undefined...
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(AllPoint[0]!.x, AllPoint[0]!.y)
+
+                    for(let i=1; i< AllPoint.length; i++){
+                        ctx.lineTo(AllPoint[i]!.x, AllPoint[i]!.y)
+                    }
+
+                    ctx.stroke();
+                    
+                    
                 }
 
 
@@ -493,7 +600,10 @@ export default function Canvas( {roomId}: canvasProps){
                 <span>Select tool:</span>
                 <button onClick={() => changeTool("rect")} className="p-2 cursor-pointer border ">Rectangle</button>
                 <button onClick={() => changeTool("circle")} className="p-2 cursor-pointer border">Circle</button>
-                 <button onClick={() => changeTool("ellipse")} className="p-2 cursor-pointer border">Ellipse</button>
+                <button onClick={() => changeTool("ellipse")} className="p-2 cursor-pointer border">Ellipse</button>
+                <button onClick={() => changeTool("line")} className="p-2 cursor-pointer border">line</button>
+                <button onClick={() => changeTool("pencil")} className="p-2 cursor-pointer border">pencil</button>
+           
             </div>
 
             <canvas ref={canvasRef} width={1000} height={1000} ></canvas>
