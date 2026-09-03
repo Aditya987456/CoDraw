@@ -21,6 +21,12 @@ type Shape = {
     x:number,
     y:number,
     radius:number
+} | {
+    type:"ellipse",
+    x:number,
+    y:number,
+    width:number,
+    height:number
 }
 
 
@@ -38,7 +44,8 @@ export default function Canvas( {roomId}: canvasProps){
     const isDrawing = useRef(false);
     const [shapes, setShapes]=useState<Shape[]>([]);  //actual data...
 
-    const [tool, setTool] = useState<"rect" | "circle">("circle");
+    const [tool, setTool] = useState<"rect" | "circle" | "ellipse">("circle");
+    const toolRef = useRef(tool)
 
     const shapeRef = useRef<Shape[]>([])   //needed becz in mousemove func old state which is [] is there becz dependency array of useeffect is [] . i.e only runs at mounting...
 
@@ -53,6 +60,11 @@ export default function Canvas( {roomId}: canvasProps){
 
 
 
+
+    function changeTool(newtool:"rect"|"circle"|"ellipse"){
+        setTool(newtool);
+        toolRef.current = newtool
+    }
 
     //this is for finding the exact coordinates of the our canvas on the view port of the browser...
     function getCanvasPoint(e: MouseEvent) {
@@ -109,6 +121,29 @@ export default function Canvas( {roomId}: canvasProps){
 
                 ctx.stroke()
 
+            }
+
+            //ellipse
+            if (shape.type === "ellipse") {
+                const centerX = shape.x + shape.width / 2;
+                const centerY = shape.y + shape.height / 2;
+
+                const radiusX = shape.width / 2;
+                const radiusY = shape.height / 2;
+
+                ctx.beginPath();
+
+                ctx.ellipse(
+                    centerX,
+                    centerY,
+                    radiusX,
+                    radiusY,
+                    0,
+                    0,
+                    Math.PI * 2
+                );
+
+                ctx.stroke();
             }
 
 
@@ -210,7 +245,7 @@ export default function Canvas( {roomId}: canvasProps){
                 let newShape : Shape;
 
 
-                if(tool === "rect"){
+                if(toolRef.current === "rect"){
                     const width = point.x - startX.current;
                     const height = point.y - startY.current;
 
@@ -224,7 +259,8 @@ export default function Canvas( {roomId}: canvasProps){
                     };
 
                 
-                }else{
+                }
+                else if(toolRef.current === "circle"){
                     const dx = point.x - startX.current;
                     const dy = point.y - startY.current;
 
@@ -236,6 +272,25 @@ export default function Canvas( {roomId}: canvasProps){
                         y: startY.current,
                         radius
                     };
+
+                }
+                else{
+
+                    const width = point.x - startX.current;
+                    const height = point.y - startY.current;
+
+                    const x = Math.min(startX.current, point.x);
+                    const y = Math.min(startY.current, point.y);
+
+                    newShape = {
+                        type: "ellipse",
+                        x,
+                        y,
+                        width: Math.abs(width),
+                        height: Math.abs(height)
+                    }
+
+
 
                 }
 
@@ -287,7 +342,7 @@ export default function Canvas( {roomId}: canvasProps){
             
 
 
-                if(tool === "rect"){
+                if(toolRef.current === "rect"){
 
                     const width = point.x - startX.current;
                     const height = point.y - startY.current;
@@ -297,7 +352,7 @@ export default function Canvas( {roomId}: canvasProps){
                 }
 
 
-                if(tool === "circle"){
+                if(toolRef.current === "circle"){
 
                     const distX = point.x - startX.current
                     const distY = point.y - startY.current
@@ -310,6 +365,36 @@ export default function Canvas( {roomId}: canvasProps){
                         startX.current,
                         startY.current,
                         radius,
+                        0,
+                        Math.PI * 2
+                    );
+
+                    ctx.stroke();
+
+                }
+
+
+                if(toolRef.current === "ellipse"){
+                    const width = point.x - startX.current;
+                    const height = point.y - startY.current;
+
+                    const x = Math.min(startX.current, point.x);
+                    const y = Math.min(startY.current, point.y);
+
+                    const centerX = x + Math.abs(width) / 2;
+                    const centerY = y + Math.abs(height) / 2;
+
+                    const radiusX = Math.abs(width) / 2;
+                    const radiusY = Math.abs(height) / 2;
+
+                    ctx.beginPath();
+
+                    ctx.ellipse(
+                        centerX,
+                        centerY,
+                        radiusX,
+                        radiusY,
+                        0,
                         0,
                         Math.PI * 2
                     );
@@ -406,8 +491,9 @@ export default function Canvas( {roomId}: canvasProps){
 
             <div>
                 <span>Select tool:</span>
-                <button onClick={() => setTool("rect")} className="p-2 border">Rectangle</button>
-                <button onClick={() => setTool("circle")} className="p-2 border">Circle</button>
+                <button onClick={() => changeTool("rect")} className="p-2 cursor-pointer border ">Rectangle</button>
+                <button onClick={() => changeTool("circle")} className="p-2 cursor-pointer border">Circle</button>
+                 <button onClick={() => changeTool("ellipse")} className="p-2 cursor-pointer border">Ellipse</button>
             </div>
 
             <canvas ref={canvasRef} width={1000} height={1000} ></canvas>
